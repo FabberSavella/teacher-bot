@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>English Teacher Bot — Articles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonte moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f9fafc;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --text: #1f2937;
+      --subtle: #6b7280;
+      --border: #e5e7eb;
+      --radius: 12px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 700px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 0.4em;
+    }
+
+    p {
+      text-align: center;
+      color: var(--subtle);
+      margin-top: 0;
+      margin-bottom: 1.5em;
+    }
+
+    textarea {
+      width: 100%;
+      height: 130px;
+      padding: 14px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      outline: none;
+      resize: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      font-size: 16px;
+      font-family: 'Poppins', sans-serif;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover { background: var(--accent-hover); }
+    button:active { transform: scale(0.98); }
+
+    pre {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-top: 24px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--subtle);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--subtle);
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Articles (a / an / the)</h1>
+  <p>Ask me about English <strong>articles</strong> only.</p>
+
+  <textarea id="q" placeholder="Type your question here... (Press Enter to send, Shift+Enter for a new line)"></textarea>
+  <div class="hint">Press <strong>Enter</strong> to send</div>
+  <button id="ask">Ask</button>
+
+  <h3>Response</h3>
+  <pre id="out">—</pre>
+
+  <footer>💬 English Teacher Bot · 2025</footer>
+
+  <script>
+    const textarea = document.getElementById('q');
+    const out = document.getElementById('out');
+    const askButton = document.getElementById('ask');
+
+    async function sendMessage() {
+      const message = textarea.value.trim();
+      if (!message) {
+        out.textContent = "Type a question first.";
+        return;
+      }
+
+      out.textContent = "Thinking...";
+      textarea.value = "";
+
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+        out.textContent = data.refused ? data.message : data.answer;
+      } catch (e) {
+        out.textContent = "Network error.";
+      }
+    }
+
+    // Clique
+    askButton.onclick = sendMessage;
+
+    // Enter envia, Shift+Enter quebra linha
+    textarea.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
